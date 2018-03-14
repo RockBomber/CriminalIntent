@@ -42,8 +42,8 @@ public class CrimeListFragment extends Fragment {
         private TextView mDateTextView;
         private Crime mCrime;
 
-        public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item_crime, parent, false));
+        public CrimeHolder(LayoutInflater inflater, ViewGroup parent, int layoutId) {
+            super(inflater.inflate(layoutId, parent, false));
             itemView.setOnClickListener(this);
             mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
             mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
@@ -72,7 +72,8 @@ public class CrimeListFragment extends Fragment {
         @Override
         public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new CrimeHolder(layoutInflater, parent);
+            // В качестве viewType мы получаем Id представления. См. getItemViewType
+            return new CrimeHolder(layoutInflater, parent, viewType);
         }
 
         @Override
@@ -84,6 +85,17 @@ public class CrimeListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mCrimes.size();
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            Crime crime = mCrimes.get(position);
+            // Решил, что проще возвращать сразу ID представления, т.к. он тоже int
+            if (crime.isRequiresPolice()) {
+                return R.layout.list_item_crime_police;
+            } else {
+                return R.layout.list_item_crime;
+            }
         }
     }
 

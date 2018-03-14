@@ -23,7 +23,10 @@ public class CrimeLab {
         for (int i=0; i<100; i++) {
             Crime crime = new Crime();
             crime.setTitle("Crime #"+i);
+            // Каждое второе преступление - решенное
             crime.setSolved(i%2 == 0);
+            // Каждое второе преступление - требует вмешатесльства полиции
+            crime.setRequiresPolice(i%2 == 0);
             mCrimes.add(crime);
         }
     }
