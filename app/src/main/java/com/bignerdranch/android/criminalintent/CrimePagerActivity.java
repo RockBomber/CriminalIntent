@@ -8,6 +8,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +20,8 @@ public class CrimePagerActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
     private List<Crime> mCrimes;
+    private Button mToBeginButton;
+    private Button mToEndButton;
 
     public static Intent newIntent(Context packageContext, UUID crimeId) {
         Intent intent = new Intent(packageContext, CrimePagerActivity.class);
@@ -33,6 +37,22 @@ public class CrimePagerActivity extends AppCompatActivity {
         UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
 
         mViewPager = (ViewPager) findViewById(R.id.crime_view_pager);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                updateUI();
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         mCrimes = CrimeLab.get(this).getCrimes();
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -56,5 +76,38 @@ public class CrimePagerActivity extends AppCompatActivity {
             }
         }
 
+        mToBeginButton = (Button) findViewById(R.id.to_begin_btn);
+        mToBeginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mViewPager.setCurrentItem(0);
+                updateUI();
+            }
+        });
+
+        mToEndButton = (Button) findViewById(R.id.to_end_btn);
+        mToEndButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mViewPager.setCurrentItem(mCrimes.size()-1);
+                updateUI();
+            }
+        });
+
+        updateUI();
     }
+
+    private void updateUI() {
+        if (mViewPager.getCurrentItem() == 0) {
+            mToBeginButton.setEnabled(false);
+        } else {
+            mToBeginButton.setEnabled(true);
+        }
+        if (mViewPager.getCurrentItem() == mCrimes.size()-1) {
+            mToEndButton.setEnabled(false);
+        } else {
+            mToEndButton.setEnabled(true);
+        }
+    }
+
 }
