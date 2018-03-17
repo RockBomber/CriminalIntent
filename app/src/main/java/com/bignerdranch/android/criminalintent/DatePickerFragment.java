@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,11 +60,7 @@ public class DatePickerFragment extends DialogFragment {
                 int month = mDatePicker.getMonth();
                 int day = mDatePicker.getDayOfMonth();
                 Date date = new GregorianCalendar(year, month, day).getTime();
-                //sendResult(Activity.RESULT_OK, date);
-                Intent intent = new Intent();
-                intent.putExtra(EXTRA_DATE, date);
-                getActivity().setResult(Activity.RESULT_OK, intent);
-                getActivity().finish();
+                sendResult(Activity.RESULT_OK, date);
             }
         });
 
@@ -102,15 +99,16 @@ public class DatePickerFragment extends DialogFragment {
     }*/
 
     private void sendResult(int resultCode, Date date) {
-        if (getTargetFragment() == null) {
-            return;
-        }
-
         Intent intent = new Intent();
         intent.putExtra(EXTRA_DATE, date);
 
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
-
+        if (getTargetFragment() == null) {
+            getActivity().setResult(resultCode, intent);
+            getActivity().finish();
+        } else {
+            getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+            dismiss();
+        }
     }
 
 }
