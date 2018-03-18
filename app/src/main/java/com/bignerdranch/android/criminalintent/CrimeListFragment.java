@@ -101,6 +101,8 @@ public class CrimeListFragment extends Fragment {
         } else {
             mAdapter.notifyDataSetChanged();
         }
+
+        updateSubtitle();
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
