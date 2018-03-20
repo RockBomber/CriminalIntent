@@ -111,12 +111,13 @@ public class CrimeFragment extends Fragment {
         mReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_SEND);
-                i.setType("text/plain");
-                i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
-                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
-                i = Intent.createChooser(i, getString(R.string.send_report));
-                startActivity(i);
+                IntentBuilder intentBuilder = IntentBuilder.from(getActivity());
+                intentBuilder.setType("text/plain");
+                intentBuilder.setText(getCrimeReport());
+                intentBuilder.setSubject(getString(R.string.crime_report_subject));
+                intentBuilder.setChooserTitle(R.string.send_report);
+                Intent intent = intentBuilder.createChooserIntent();
+                startActivity(intent);
             }
         });
 
