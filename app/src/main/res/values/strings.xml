@@ -18,4 +18,6 @@
     <string name="crime_report_suspect">the suspect is %1$s.</string>
     <string name="crime_report_subject">CriminalIntent Crime Report</string>
     <string name="send_report">Send crime report via</string>
+    <string name="call_suspect">Call suspect: %1$s</string>
+    <string name="suspect_have_no_phone_number">Suspect have no phone number</string>
 </resources>

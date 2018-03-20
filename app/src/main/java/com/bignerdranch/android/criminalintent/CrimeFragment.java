@@ -6,7 +6,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds;
+import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat.IntentBuilder;
@@ -38,6 +39,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mSuspectButton;
     private Button mReportButton;
+    private Button mCallSuspectButton;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -121,7 +123,7 @@ public class CrimeFragment extends Fragment {
             }
         });
 
-        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        final Intent pickContact = new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI);
         mSuspectButton = (Button) v.findViewById(R.id.crime_suspect);
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,6 +142,24 @@ public class CrimeFragment extends Fragment {
             mSuspectButton.setEnabled(false);
         }
 
+        mCallSuspectButton = (Button) v.findViewById(R.id.call_suspect);
+        mCallSuspectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_DIAL);
+                i.setData(Uri.parse("tel:"+mCrime.getPhoneNumber()));
+                startActivity(i);
+            }
+        });
+
+        if (mCrime.getPhoneNumber() != null) {
+            mCallSuspectButton.setEnabled(true);
+            mCallSuspectButton.setText(getString(R.string.call_suspect, mCrime.getPhoneNumber()));
+        } else {
+            mCallSuspectButton.setEnabled(false);
+            mCallSuspectButton.setText(getString(R.string.suspect_have_no_phone_number));
+        }
+
         return v;
     }
 
@@ -155,9 +175,11 @@ public class CrimeFragment extends Fragment {
         } else if (requestCode == REQUEST_CONTACT && data != null) {
             Uri contactUri = data.getData();
             // Определение полей, значения которых должны быть возвращены запросом
-            String[] queryFields = new String[]{ContactsContract.Contacts.DISPLAY_NAME};
+            String[] queryFields = new String[]{Contacts.DISPLAY_NAME, Contacts._ID, Contacts.HAS_PHONE_NUMBER};
             // Выполнение запроса - contactUri здесь выполняет функции условия "where"
             Cursor c = getActivity().getContentResolver().query(contactUri, queryFields, null, null, null);
+            long id; // _id контакта в адресной книги для получения номера телефона
+            int hasPhoneNumber; // An indicator of whether this contact has at least one phone number. "1" if there is at least one phone number, "0" otherwise.
             try {
                 // Проверка получения результатов
                 if (c.getCount() == 0) {
@@ -166,13 +188,40 @@ public class CrimeFragment extends Fragment {
                 // Извлечение первого столбца данных - имени подозреваемого
                 c.moveToFirst();
                 String suspect = c.getString(0);
+                id = c.getLong(1);
+                hasPhoneNumber = c.getInt(2);
+
                 mCrime.setSuspect(suspect);
                 mSuspectButton.setText(suspect);
             } finally {
                 c.close();
             }
-        }
 
+            if (hasPhoneNumber == 1) {
+                Uri phoneUri = CommonDataKinds.Phone.CONTENT_URI;
+                String[] phoneFields = new String[]{CommonDataKinds.Phone.NUMBER};
+                String phoneSelection = CommonDataKinds.Phone.CONTACT_ID + " =?";
+                String[] phoneSelectionArgs = new String[]{String.valueOf(id)};
+                Cursor phoneCursor = getActivity().getContentResolver().query(phoneUri, phoneFields, phoneSelection, phoneSelectionArgs, null);
+                try {
+                    int phoneCursorCount = phoneCursor.getCount();
+                    if (phoneCursorCount == 0) {
+                        return;
+                    }
+                    phoneCursor.moveToFirst();
+                    String phoneNumber = phoneCursor.getString(0);
+                    mCrime.setPhoneNumber(phoneNumber);
+                    mCallSuspectButton.setEnabled(true);
+                    mCallSuspectButton.setText(getString(R.string.call_suspect, mCrime.getPhoneNumber()));
+                } finally {
+                    phoneCursor.close();
+                }
+            } else {
+                mCrime.setPhoneNumber(null);
+                mCallSuspectButton.setEnabled(false);
+                mCallSuspectButton.setText(getString(R.string.suspect_have_no_phone_number));
+            }
+        }
     }
 
     private void updateDate() {
