@@ -13,7 +13,7 @@ public class PictureUtils {
 
         return getScaledBitmap(path, size.x, size.y);
     }
-    
+
     public static Bitmap getScaledBitmap(String path, int destWidth, int destHeight) {
         // Чтение размеров изображения на диске
         BitmapFactory.Options options = new BitmapFactory.Options();
