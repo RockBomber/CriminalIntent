@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +33,7 @@ public class CrimeListFragment extends Fragment {
      */
     public interface Callbacks {
         void onCrimeSelected(Crime crime);
+        void onCrimeDeleted(Crime crime);
     }
 
     @Override
@@ -57,6 +59,10 @@ public class CrimeListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
         mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        TouchController controller = new TouchController();
+        ItemTouchHelper touchHelper = new ItemTouchHelper(controller);
+        touchHelper.attachToRecyclerView(mCrimeRecyclerView);
 
         if (savedInstanceState != null) {
             mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
@@ -161,6 +167,10 @@ public class CrimeListFragment extends Fragment {
             mSolvedImageView.setVisibility(crime.isSolved() ? View.VISIBLE : View.GONE);
         }
 
+        public Crime getCrime() {
+            return mCrime;
+        }
+
         @Override
         public void onClick(View view) {
             mCallbacks.onCrimeSelected(mCrime);
@@ -194,6 +204,28 @@ public class CrimeListFragment extends Fragment {
 
         public void setCrimes(List<Crime> crimes) {
             mCrimes = crimes;
+        }
+    }
+
+    private class TouchController extends ItemTouchHelper.Callback {
+
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            // Разрешаем двигать в стороны, но не в вверх-вниз
+            return ItemTouchHelper.Callback.makeMovementFlags(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            CrimeHolder holder = (CrimeHolder) viewHolder;
+            CrimeLab.get(getActivity()).deleteCrime(holder.getCrime());
+            mCallbacks.onCrimeDeleted(holder.getCrime());
+            updateUI();
         }
     }
 
