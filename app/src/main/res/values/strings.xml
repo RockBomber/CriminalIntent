@@ -22,4 +22,5 @@
     <string name="crime_photo_no_image_description">Crime scene photo (not set)</string>
     <string name="crime_photo_image_description">Crime scene photo (set)</string>
     <string name="crime_call_suspect">Call suspect %1$s</string>
+    <string name="crime_photo_setted">Crime photo setted</string>
 </resources>

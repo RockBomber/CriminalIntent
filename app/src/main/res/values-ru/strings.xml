@@ -22,4 +22,5 @@
     <string name="crime_photo_no_image_description">Фотография преступления (отсутствует)</string>
     <string name="crime_photo_image_description">Фотография преступления (присутствует)</string>
     <string name="crime_call_suspect">Вызвать подозреваемого %1$s</string>
+    <string name="crime_photo_setted">Сделана фотография преступления</string>
 </resources>
