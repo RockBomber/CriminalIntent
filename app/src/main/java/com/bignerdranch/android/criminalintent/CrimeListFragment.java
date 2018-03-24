@@ -60,8 +60,17 @@ public class CrimeListFragment extends Fragment {
         mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        TouchController controller = new TouchController();
-        ItemTouchHelper touchHelper = new ItemTouchHelper(controller);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                mAdapter.deleteCrime(viewHolder.getAdapterPosition());
+            }
+        });
         touchHelper.attachToRecyclerView(mCrimeRecyclerView);
 
         if (savedInstanceState != null) {
@@ -210,24 +219,4 @@ public class CrimeListFragment extends Fragment {
             mCallbacks.onCrimeDeleted(crime);
         }
     }
-
-    private class TouchController extends ItemTouchHelper.Callback {
-
-        @Override
-        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            // Разрешаем двигать в стороны, но не в вверх-вниз
-            return ItemTouchHelper.Callback.makeMovementFlags(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
-        }
-
-        @Override
-        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-            return false;
-        }
-
-        @Override
-        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            mAdapter.deleteCrime(viewHolder.getAdapterPosition());
-        }
-    }
-
 }
