@@ -167,10 +167,6 @@ public class CrimeListFragment extends Fragment {
             mSolvedImageView.setVisibility(crime.isSolved() ? View.VISIBLE : View.GONE);
         }
 
-        public Crime getCrime() {
-            return mCrime;
-        }
-
         @Override
         public void onClick(View view) {
             mCallbacks.onCrimeSelected(mCrime);
@@ -205,6 +201,14 @@ public class CrimeListFragment extends Fragment {
         public void setCrimes(List<Crime> crimes) {
             mCrimes = crimes;
         }
+
+        public void deleteCrime(int position) {
+            Crime crime = mCrimes.get(position);
+            CrimeLab.get(getActivity()).deleteCrime(crime);
+            mCrimes.remove(position);
+            notifyItemRemoved(position);
+            mCallbacks.onCrimeDeleted(crime);
+        }
     }
 
     private class TouchController extends ItemTouchHelper.Callback {
@@ -222,10 +226,7 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            CrimeHolder holder = (CrimeHolder) viewHolder;
-            CrimeLab.get(getActivity()).deleteCrime(holder.getCrime());
-            mCallbacks.onCrimeDeleted(holder.getCrime());
-            updateUI();
+            mAdapter.deleteCrime(viewHolder.getAdapterPosition());
         }
     }
 

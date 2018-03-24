@@ -31,7 +31,7 @@ public class CrimeListActivity extends SingleFragmentActivity implements CrimeLi
         if (findViewById(R.id.detail_fragment_container) != null) {
             CrimeFragment fragment = (CrimeFragment) getSupportFragmentManager().findFragmentById(R.id.detail_fragment_container);
             // Очищаем фрагмет только если отображалось удаленное преступление
-            if (crime.getId().equals(fragment.getCrime().getId())) {
+            if (fragment != null && crime.getId().equals(fragment.getCrime().getId())) {
                 getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             }
         }
