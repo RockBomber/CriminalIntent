@@ -18,4 +18,7 @@
     <string name="crime_report_suspect">подозреваемый: %1$s.</string>
     <string name="crime_report_subject">Доклад о преступлении</string>
     <string name="send_report">Отправить доклад через</string>
+    <string name="crime_photo_button_description">Сфотографировать преступление</string>
+    <string name="crime_photo_no_image_description">Фотография преступления (отсутствует)</string>
+    <string name="crime_photo_image_description">Фотография преступления (присутствует)</string>
 </resources>
