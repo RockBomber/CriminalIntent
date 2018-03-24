@@ -167,6 +167,9 @@ public class CrimeFragment extends Fragment {
 
         if (mCrime.getSuspect() != null) {
             mSuspectButton.setText(mCrime.getSuspect());
+            mSuspectButton.setContentDescription(getString(R.string.crime_call_suspect, mCrime.getSuspect()));
+        } else {
+            mSuspectButton.setContentDescription(getString(R.string.crime_suspect_text));
         }
 
         // деактивировать кнопку выбора контакта, если нету приложения с контактами
@@ -229,6 +232,7 @@ public class CrimeFragment extends Fragment {
                 mCrime.setSuspect(suspect);
                 updateCrime();
                 mSuspectButton.setText(suspect);
+                mSuspectButton.setContentDescription(getString(R.string.crime_call_suspect, suspect));
             } finally {
                 c.close();
             }
